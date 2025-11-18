@@ -50,6 +50,12 @@
             <version>2.0.17</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.17</version>
+        </dependency>
+
         <!--сокращение кода-->
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -66,7 +72,7 @@
 
 
     <build>
-        <finalName>spring-web-demo</finalName>
+        <finalName>ROOT</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>

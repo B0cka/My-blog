@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS posts (
     text TEXT NOT NULL,
     tags TEXT[],
     likes_count BIGINT DEFAULT 0,
-    comments_count BIGINT DEFAULT 0
+    comments_count BIGINT DEFAULT 0,
+    image BYTEA
 );

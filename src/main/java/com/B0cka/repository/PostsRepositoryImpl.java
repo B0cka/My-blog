@@ -1,7 +1,6 @@
 package com.B0cka.repository;
 
-import com.B0cka.dto.FrontPostsRequest;
-import com.B0cka.model.Posts;
+import com.B0cka.model.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,33 +19,28 @@ public class PostsRepositoryImpl implements PostsRepository{
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Posts save(Posts posts) {
+    public Post save(Post post) {
         log.info("Сохранение в бд");
-
-        jdbcTemplate.update("insert into posts(title, text, tags) values(?, ?, ?)", Statement.RETURN_GENERATED_KEYS,
-               posts.getTitle(), posts.getText(), posts.getTags());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "insert into posts(title, text, tags) values(?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS
+                    "insert into posts(title, text, tags, likes_count, comments_count) values (?, ?, ?, ?, ?)",
+                    new String[]{"id"}
             );
-            ps.setString(1, posts.getTitle());
-            ps.setString(2, posts.getText());
-            ps.setObject(3, posts.getAuthorId());
-            ps.setInt(4, post.getLikesCount() != null ? post.getLikesCount() : 0);
-            ps.setBytes(5, post.getImage());
+            ps.setString(1, post.getTitle());
+            ps.setString(2, post.getText());
+            ps.setArray(3, connection.createArrayOf("text", post.getTags().toArray()));
+            ps.setLong(4, 0);
+            ps.setLong(5, 0);
             return ps;
         }, keyHolder);
 
-        if (keyHolder.getKey() != null) {
-            post.setId(keyHolder.getKey().longValue());
-        }
+        post.setId(keyHolder.getKey().longValue());
+        post.setLikesCount(0L);
+        post.setCommentsCount(0L);
 
-        posts.setId(keyHolder.getKey().longValue());
-
-        return posts;
+        return post;
     }
 
 }

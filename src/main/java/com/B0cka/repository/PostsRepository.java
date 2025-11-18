@@ -1,14 +1,9 @@
 package com.B0cka.repository;
 
-import com.B0cka.dto.FrontPostsRequest;
-import com.B0cka.model.Posts;
+import com.B0cka.model.Post;
 
 public interface PostsRepository {
 
-    Posts save(Posts posts);
-
-//    void update(Long id, User user);
-//
-//    void deleteById(Long id);
+    Post save(Post post);
 
 }

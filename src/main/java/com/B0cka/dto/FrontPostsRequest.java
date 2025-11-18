@@ -1,11 +1,13 @@
 package com.B0cka.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class FrontPostsRequest {
 
     @NonNull //<- проверка на не нулевые значения
@@ -13,6 +15,6 @@ public class FrontPostsRequest {
     @NonNull
     private String text;
     @NonNull
-    private ArrayList<String> tags;
+    private List<String> tags;
 
 }

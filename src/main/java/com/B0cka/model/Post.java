@@ -2,19 +2,18 @@ package com.B0cka.model;
 
 import lombok.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Posts {
+public class Post {
 
     private Long id;
     private String title;
     private String text;
-    private ArrayList<String> tags;
+    private List<String> tags;
     private Long likesCount;
     private Long commentsCount;
 

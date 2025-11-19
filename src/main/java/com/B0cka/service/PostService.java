@@ -50,6 +50,11 @@ public class PostService {
         log.info("Image updated for post id={}", id);
     }
 
+    public byte[] getPostImage(Long id){
+        log.info("Get image for post id={} in service", id);
+        return postsRepository.getPostImage(id);
+    }
+
     public Long incrementLikes(Long id) {
         return postsRepository.incrementLikes(id);
     }

@@ -4,4 +4,3 @@ services:
     build: .
     ports: 
       - "80:80"
-#    network_mode: "host"

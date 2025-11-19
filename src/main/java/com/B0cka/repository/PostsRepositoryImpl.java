@@ -45,6 +45,7 @@ public class PostsRepositoryImpl implements PostsRepository {
         return post;
     }
 
+    @Override
     public void updateImg(byte[] bytes, Long id){
         jdbcTemplate.update(
                 "UPDATE posts SET image = ? WHERE id = ?",
@@ -52,6 +53,14 @@ public class PostsRepositoryImpl implements PostsRepository {
         );
     }
 
+    @Override
+    public byte[] getPostImage(Long id) {
+        return jdbcTemplate.queryForObject(
+                "SELECT image FROM posts WHERE id = ?",
+                (rs, rowNum) -> rs.getBytes("image"),
+                id
+        );
+    }
     @Override
     public Post update(Post post) {
         log.info("Updating post id={} in DB", post.getId());

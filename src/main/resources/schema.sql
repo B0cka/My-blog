@@ -7,3 +7,9 @@ CREATE TABLE IF NOT EXISTS posts (
     comments_count BIGINT DEFAULT 0,
     image BYTEA
 );
+
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGSERIAL PRIMARY KEY,
+    post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
+    text TEXT NOT NULL
+);

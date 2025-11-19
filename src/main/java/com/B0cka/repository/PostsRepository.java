@@ -10,6 +10,7 @@ public interface PostsRepository {
     Post save(Post post);
     List<Post> findAll();
     void updateImg(byte[] bytes, Long id);
+    byte[] getPostImage(Long id);
     Optional<Post> findById(Long id);
     Post update(Post post);
     void delete(Long id);

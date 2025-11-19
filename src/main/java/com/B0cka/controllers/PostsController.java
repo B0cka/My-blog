@@ -70,4 +70,9 @@ public class PostsController {
         return postService.getAll();
     }
 
+    @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getPostImage(@PathVariable("id") Long id) {
+        log.info("Get image for post id={}", id);
+        return postService.getPostImage(id);
+    }
 }

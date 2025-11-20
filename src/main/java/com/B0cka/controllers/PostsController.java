@@ -1,6 +1,7 @@
 package com.B0cka.controllers;
 
 import com.B0cka.dto.FrontPostsRequest;
+import com.B0cka.dto.PostsResponse;
 import com.B0cka.model.Post;
 import com.B0cka.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +75,12 @@ public class PostsController {
     public byte[] getPostImage(@PathVariable("id") Long id) {
         log.info("Get image for post id={}", id);
         return postService.getPostImage(id);
+    }
+
+    @GetMapping
+    public PostsResponse getPosts(@RequestParam(value = "search", required = false, defaultValue = "") String search,
+                                  @RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
+                                  @RequestParam(value = "pageSize", defaultValue = "5") int pageSize) {
+        return postService.getPagedPosts(search, pageNumber, pageSize);
     }
 }

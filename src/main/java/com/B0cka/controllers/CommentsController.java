@@ -18,24 +18,26 @@ public class CommentsController {
     private final CommentService commentService;
 
     @GetMapping
-    public List<Comment> getComments(@PathVariable Long postId) {
+    public List<Comment> getComments(@PathVariable("postId") Long postId) {
         return commentService.findByPostId(postId);
     }
 
     @GetMapping("/{id}")
-    public Comment getComment(@PathVariable Long postId, @PathVariable Long id) {
+    public Comment getComment(@PathVariable("postId") Long postId,
+                              @PathVariable("id") Long id) {
         return commentService.findById(postId, id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Comment addComment(@PathVariable Long postId, @RequestBody Comment comment) {
+    public Comment addComment(@PathVariable("postId") Long postId,
+                              @RequestBody Comment comment) {
         return commentService.createComment(postId, comment);
     }
 
     @PutMapping("/{id}")
-    public Comment updateComment(@PathVariable Long postId,
-                                 @PathVariable Long id,
+    public Comment updateComment(@PathVariable("postId") Long postId,
+                                 @PathVariable("id") Long id,
                                  @RequestBody Comment comment) {
         comment.setId(id);
         return commentService.updateComment(postId, comment);
@@ -43,7 +45,8 @@ public class CommentsController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteComment(@PathVariable Long postId, @PathVariable Long id) {
+    public void deleteComment(@PathVariable("postId") Long postId,
+                              @PathVariable("id") Long id) {
         commentService.deleteComment(postId, id);
     }
 }

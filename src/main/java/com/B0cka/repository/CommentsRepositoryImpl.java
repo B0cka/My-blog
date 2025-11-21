@@ -1,5 +1,6 @@
 package com.B0cka.repository;
 
+import com.B0cka.dto.CommentRequestDto;
 import com.B0cka.model.Comment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class CommentsRepositoryImpl implements CommentsRepository {
     }
 
     @Override
-    public Comment save(Comment comment) {
+    public Comment save(CommentRequestDto comment) {
         KeyHolder kh = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(
@@ -56,8 +57,15 @@ public class CommentsRepositoryImpl implements CommentsRepository {
             ps.setString(2, comment.getText());
             return ps;
         }, kh);
-        comment.setId(kh.getKey().longValue());
-        return comment;
+
+        Comment com = Comment.builder()
+                .id(kh.getKey().longValue())
+                .text(comment.getText())
+                .postId(comment.getPostId())
+                .build();
+
+        log.info("Сохранение коментария: {}",com);
+        return com;
     }
 
     @Override

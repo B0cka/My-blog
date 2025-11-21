@@ -1,5 +1,6 @@
 package com.B0cka.service;
 
+import com.B0cka.dto.CommentRequestDto;
 import com.B0cka.model.Comment;
 import com.B0cka.repository.CommentsRepository;
 import com.B0cka.repository.PostsRepository;
@@ -45,7 +46,7 @@ public class CommentService {
                 });
     }
 
-    public Comment createComment(Long postId, Comment comment) {
+    public Comment createComment(Long postId, CommentRequestDto comment) {
         log.info("Create comment for post id={}, text={}", postId, comment != null ? comment.getText() : null);
         if (postId == null || comment == null) {
             log.error("createComment(): postId or comment is null");
@@ -61,7 +62,6 @@ public class CommentService {
         postsRepository.findById(postId).ifPresent(post -> {
             long newCount = post.getCommentsCount() + 1;
             post.setCommentsCount(newCount);
-            post.setId(postId);
             postsRepository.update(post);
             log.info("Updated commentsCount for post id={} -> {}", postId, newCount);
         });
@@ -70,7 +70,7 @@ public class CommentService {
     }
 
     public Comment updateComment(Long postId, Comment comment) {
-        log.info("Update comment id={} for post id={}", comment != null ? comment.getId() : null, postId);
+        log.info("Update comment id={} for post id={}", postId, comment.getId());
         if (postId == null || comment == null) {
             log.error("updateComment(): null arguments");
             throw new IllegalArgumentException("Post id and comment must not be null");

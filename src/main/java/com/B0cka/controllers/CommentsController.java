@@ -1,5 +1,6 @@
 package com.B0cka.controllers;
 
+import com.B0cka.dto.CommentRequestDto;
 import com.B0cka.model.Comment;
 import com.B0cka.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class CommentsController {
     @PostMapping("/{postId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public Comment addComment(@PathVariable("postId") Long postId,
-                              @RequestBody Comment comment) {
+                              @RequestBody CommentRequestDto comment) {
         return commentService.createComment(postId, comment);
     }
 

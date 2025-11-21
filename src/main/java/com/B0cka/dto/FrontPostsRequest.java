@@ -17,4 +17,9 @@ public class FrontPostsRequest {
     @NonNull
     private List<String> tags;
 
+    public FrontPostsRequest(@NonNull String title, @NonNull String text, @NonNull List<String> tags) {
+        this.title = title;
+        this.text = text;
+        this.tags = tags;
+    }
 }

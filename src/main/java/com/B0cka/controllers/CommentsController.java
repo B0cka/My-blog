@@ -11,31 +11,31 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/posts/{postId}/comments")
+@RequestMapping("/api/posts")
 @Slf4j
 public class CommentsController {
 
     private final CommentService commentService;
 
-    @GetMapping
+    @GetMapping("/{postId}/comments")
     public List<Comment> getComments(@PathVariable("postId") Long postId) {
         return commentService.findByPostId(postId);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{postId}/comments/{id}")
     public Comment getComment(@PathVariable("postId") Long postId,
                               @PathVariable("id") Long id) {
         return commentService.findById(postId, id);
     }
 
-    @PostMapping
+    @PostMapping("/{postId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public Comment addComment(@PathVariable("postId") Long postId,
                               @RequestBody Comment comment) {
         return commentService.createComment(postId, comment);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{postId}/comments/{id}")
     public Comment updateComment(@PathVariable("postId") Long postId,
                                  @PathVariable("id") Long id,
                                  @RequestBody Comment comment) {
@@ -43,7 +43,7 @@ public class CommentsController {
         return commentService.updateComment(postId, comment);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{postId}/comments/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteComment(@PathVariable("postId") Long postId,
                               @PathVariable("id") Long id) {

@@ -41,7 +41,7 @@ public class PostsRepositoryImpl implements PostsRepository {
         post.setId(keyHolder.getKey().longValue());
         post.setLikesCount(0L);
         post.setCommentsCount(0L);
-
+        log.info("Saved post: {}", post);
         return post;
     }
 
@@ -66,12 +66,14 @@ public class PostsRepositoryImpl implements PostsRepository {
         log.info("Updating post id={} in DB", post.getId());
         jdbcTemplate.update(connection -> {
             var ps = connection.prepareStatement(
-                    "UPDATE posts SET title=?, text=?, tags=?, image=? WHERE id=?");
+                    "UPDATE posts SET title=?, text=?, tags=?, image=?, likes_count=?, comments_count=? WHERE id=?");
             ps.setString(1, post.getTitle());
             ps.setString(2, post.getText());
             ps.setArray(3, connection.createArrayOf("text", post.getTags().toArray()));
             ps.setBytes(4, post.getImage());
-            ps.setLong(5, post.getId());
+            ps.setLong(5, post.getLikesCount());
+            ps.setLong(6, post.getCommentsCount());
+            ps.setLong(7, post.getId());
             return ps;
         });
 

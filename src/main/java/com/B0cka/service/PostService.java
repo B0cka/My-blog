@@ -152,25 +152,39 @@ public class PostService {
     }
 
     public PostsResponse getPagedPosts(String search, int pageNumber, int pageSize) {
-        List<Post> all = postsRepository.findAll();
+        log.info("Find posts with params: search = {}, pageNumber = {}, pageSize = {}", search, pageNumber, pageSize);
+
+        if (pageNumber < 1) {
+            pageNumber = 1;
+        }
+        if (pageSize < 1 || pageSize > 100) {
+            pageSize = 10; // разумный дефолт
+        }
+
+        List<Post> allPosts = postsRepository.findAll();
 
         if (search != null && !search.isBlank()) {
-            String q = search.toLowerCase();
-            all = all.stream()
-                    .filter(p -> p.getTitle() != null && p.getTitle().toLowerCase().contains(q))
+            String query = search.toLowerCase();
+            allPosts = allPosts.stream()
+                    .filter(p -> p.getTitle() != null &&
+                            p.getTitle().toLowerCase().contains(query))
                     .toList();
         }
 
-        int total = all.size();
-        int lastPage = (int) Math.ceil((double) total / pageSize);
+        int totalCount = allPosts.size();
+        if (totalCount == 0) {
+            return new PostsResponse(List.of(), false, false, 1);
+        }
 
-        if (pageNumber < 1) pageNumber = 1;
-        if (pageNumber > lastPage) pageNumber = lastPage;
+        int lastPage = (int) Math.ceil((double) totalCount / pageSize);
+        if (pageNumber > lastPage) {
+            pageNumber = lastPage;
+        }
 
-        int from = (pageNumber - 1) * pageSize;
-        int to = Math.min(from + pageSize, total);
+        int start = (pageNumber - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalCount);
 
-        List<Post> page = all.subList(from, to);
+        List<Post> page = allPosts.subList(start, end);
 
         for (Post p : page) {
             if (p.getText() != null && p.getText().length() > 128) {

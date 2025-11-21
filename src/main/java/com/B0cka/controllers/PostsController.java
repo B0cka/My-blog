@@ -1,7 +1,9 @@
 package com.B0cka.controllers;
 
 import com.B0cka.dto.FrontPostsRequest;
+import com.B0cka.dto.PostFullDto;
 import com.B0cka.dto.PostsResponse;
+import com.B0cka.mapper.PostMapper;
 import com.B0cka.model.Post;
 import com.B0cka.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +25,20 @@ public class PostsController {
 
     private final PostService postService;
 
-    @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    public Post createPost(@RequestBody FrontPostsRequest frontPostsRequest){
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PostFullDto> createPost(@RequestBody FrontPostsRequest frontPostsRequest){
         log.info("Create new post with text: {}", frontPostsRequest.getText());
-
-        return postService.createPost(frontPostsRequest);
+        Post post = postService.createPost(frontPostsRequest);
+        log.info("CONTROLLER POST: {}", post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(PostMapper.toDto(post));
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Post updatePost(@PathVariable("id") Long id, @RequestBody FrontPostsRequest request) {
+    public ResponseEntity<PostFullDto> updatePost(@PathVariable("id") Long id, @RequestBody FrontPostsRequest request) {
         log.info("Update post id {} with new data: {}", id, request);
-        return postService.updatePost(id, request);
+        Post post = postService.updatePost(id, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(PostMapper.toDto(post));
     }
 
     @PostMapping("/{id}/likes")
@@ -63,12 +66,6 @@ public class PostsController {
         postService.savePostImage(id, image);
 
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping
-    public List<Post> getAllPosts() {
-        log.info("Get all posts");
-        return postService.getAll();
     }
 
     @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)

@@ -58,6 +58,14 @@ public class CommentService {
         }
 
         comment.setPostId(postId);
+        postsRepository.findById(postId).ifPresent(post -> {
+            long newCount = post.getCommentsCount() + 1;
+            post.setCommentsCount(newCount);
+            post.setId(postId);
+            postsRepository.update(post);
+            log.info("Updated commentsCount for post id={} -> {}", postId, newCount);
+        });
+
         return commentsRepository.save(comment);
     }
 
@@ -98,6 +106,13 @@ public class CommentService {
             throw new IllegalArgumentException("Comment not found");
         }
         commentsRepository.delete(postId, id);
+        postsRepository.findById(postId).ifPresent(post -> {
+            long current = post.getCommentsCount() != null ? post.getCommentsCount() : 0L;
+            if (current > 0) post.setCommentsCount(current - 1);
+            postsRepository.update(post);
+            log.info("DELETED commentsCount for post id={} -> {}", postId, post.getCommentsCount());
+        });
+
         log.info("Deleted comment id={} for post id={}", id, postId);
     }
 

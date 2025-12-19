@@ -7,10 +7,14 @@ import com.B0cka.repository.PostsRepository;
 import com.B0cka.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Важно добавить!
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.util.List;
 
@@ -24,15 +28,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post createPost(FrontPostsRequest frontPostsRequest){
         log.info("Create post in service with params: {}", frontPostsRequest);
-
-        if (frontPostsRequest == null) {
-            log.error("FrontPostsRequest is null");
-            throw new IllegalArgumentException("Request body can't be null");
-        }
-        if (isBlank(frontPostsRequest.getTitle()) || isBlank(frontPostsRequest.getText())) {
-            log.error("Empty title or text in createPost()");
-            throw new IllegalArgumentException("Title and text must not be empty");
-        }
 
         Post post = Post.builder()
                 .text(frontPostsRequest.getText().trim())
@@ -49,25 +44,11 @@ public class PostServiceImpl implements PostService {
     public Post updatePost(Long id, FrontPostsRequest req) {
         log.info("Update post id={} with new values", id);
 
-        if (id == null) {
-            log.error("updatePost(): id is null");
-            throw new IllegalArgumentException("Post id can't be null");
-        }
-        if (req == null) {
-            log.error("updatePost(): request body is null");
-            throw new IllegalArgumentException("Request can't be null");
-        }
-
         Post existing = postsRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Post with id={} not found", id);
                     return new IllegalArgumentException("Post not found: id=" + id);
                 });
-
-        if (isBlank(req.getTitle()) || isBlank(req.getText())) {
-            log.error("updatePost(): title/text empty for id={}", id);
-            throw new IllegalArgumentException("Title and text must not be empty");
-        }
 
         existing.setTitle(req.getTitle().trim());
         existing.setText(req.getText().trim());
@@ -81,20 +62,10 @@ public class PostServiceImpl implements PostService {
     public void savePostImage(Long id, MultipartFile image){
         log.info("Save post image for id={}", id);
 
-        if (id == null) {
-            throw new IllegalArgumentException("Post id can't be null");
-        }
-        if (image == null || image.isEmpty()) {
-            throw new IllegalArgumentException("Image file must not be null or empty");
-        }
-        if (!postsRepository.existsById(id)) {
-            throw new IllegalArgumentException("Post id=" + id + " not found");
-        }
-
         try {
             postsRepository.updateImage(id, image.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Error in saving img: ", e);
         }
 
         log.info("Image successfully updated for post id={}", id);
@@ -134,6 +105,7 @@ public class PostServiceImpl implements PostService {
 
     public List<Post> getAll() {
         log.info("Retrieve all posts");
+
         return postsRepository.findAll();
     }
 
@@ -171,42 +143,31 @@ public class PostServiceImpl implements PostService {
     public PostsResponse getPagedPosts(String search, int pageNumber, int pageSize) {
         log.info("Find posts: search={}, page={}, size={}", search, pageNumber, pageSize);
 
-        if (pageNumber < 1) pageNumber = 1;
-        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+        int page = Math.max(pageNumber - 1, 0);
+        int size = (pageSize < 1 || pageSize > 100) ? 10 : pageSize;
 
-        List<Post> allPosts;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<Post> postPage;
 
         if (search != null && !search.isBlank()) {
-
-            allPosts = postsRepository.findAllByTitleContainingIgnoreCase(search.trim());
+            postPage = postsRepository.findAllByTitleContainingIgnoreCase(search.trim(), pageable);
         } else {
-            allPosts = postsRepository.findAll();
+            postPage = postsRepository.findAll(pageable);
         }
 
-        int totalCount = allPosts.size();
-        if (totalCount == 0) {
-            return new PostsResponse(List.of(), false, false, 1);
-        }
-
-        int lastPage = (int) Math.ceil((double) totalCount / pageSize);
-        if (pageNumber > lastPage) {
-            pageNumber = lastPage;
-        }
-
-        int start = (pageNumber - 1) * pageSize;
-        int end = Math.min(start + pageSize, totalCount);
-
-        List<Post> page = allPosts.subList(start, end);
-
-        for (Post p : page) {
+        List<Post> content = postPage.getContent();
+        content.forEach(p -> {
             if (p.getText() != null && p.getText().length() > 128) {
                 p.setText(p.getText().substring(0, 128) + "…");
             }
-        }
+        });
 
-        boolean hasPrev = pageNumber > 1;
-        boolean hasNext = pageNumber < lastPage;
-
-        return new PostsResponse(page, hasPrev, hasNext, lastPage);
+        return new PostsResponse(
+                content,
+                postPage.hasPrevious(),
+                postPage.hasNext(),
+                postPage.getTotalPages()
+        );
     }
 }

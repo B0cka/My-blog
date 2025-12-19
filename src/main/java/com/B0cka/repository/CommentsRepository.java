@@ -1,14 +1,14 @@
 package com.B0cka.repository;
 
-import com.B0cka.dto.CommentRequestDto;
 import com.B0cka.model.Comment;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface CommentsRepository {
-    List<Comment> findByPostId(Long postId);
-    Optional<Comment> findById(Long postId, Long id);
-    Comment save(CommentRequestDto comment);
-    Comment update(Comment comment);
-    void delete(Long postId, Long id);
+@Repository
+public interface CommentsRepository extends CrudRepository<Comment, Long> {
+    List<Comment> findAllByPostId(Long postId);
+    Optional<Comment> findByIdAndPostId(Long id, Long postId);
 }

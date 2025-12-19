@@ -6,27 +6,29 @@ import com.B0cka.dto.PostsResponse;
 import com.B0cka.mapper.PostMapper;
 import com.B0cka.model.Post;
 import com.B0cka.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
+@Validated
 public class PostsController {
 
     private final PostService postService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PostFullDto> createPost(@RequestBody FrontPostsRequest frontPostsRequest){
+    public ResponseEntity<PostFullDto> createPost(@Valid @RequestBody FrontPostsRequest frontPostsRequest){
         log.info("Create new post with text: {}", frontPostsRequest.getText());
         Post post = postService.createPost(frontPostsRequest);
         log.info("CONTROLLER POST: {}", post);
@@ -34,7 +36,7 @@ public class PostsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostFullDto> updatePost(@PathVariable("id") Long id, @RequestBody FrontPostsRequest request) {
+    public ResponseEntity<PostFullDto> updatePost(@PathVariable("id") Long id,@Valid @RequestBody FrontPostsRequest request) {
         log.info("Update post id {} with new data: {}", id, request);
         Post post = postService.updatePost(id, request);
 

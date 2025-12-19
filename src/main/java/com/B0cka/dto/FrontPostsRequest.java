@@ -1,5 +1,7 @@
 package com.B0cka.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -10,11 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 public class FrontPostsRequest {
 
-    @NonNull //<- проверка на не нулевые значения
+    @NonNull
+    @NotBlank
     private String title;
     @NonNull
+    @NotBlank
     private String text;
-    @NonNull
+    @NotEmpty(message = "Tags must not be empty")
     private List<String> tags;
 
     public FrontPostsRequest(@NonNull String title, @NonNull String text, @NonNull List<String> tags) {
